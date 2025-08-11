@@ -1,0 +1,32 @@
+.fullcalendardiv {
+    display: flex;
+    justify-content: center;
+}
+/* 캘린더 전체 사이즈 조정 */
+.dashboarddiv .fc {
+    min-width: 500px;
+    min-height: 500px;
+}
+
+/* toolbar container */
+.dashboarddiv .fc .fc-toolbar.fc-header-toolbar {
+margin: 0;
+padding: 0 40px;
+background-color: #356eff;
+height: 63px;
+font-weight: 600;
+font-size: 12px;
+line-height: 29px;
+color: white;
+border-radius: 20px 20px 0px 0px;
+}
+
+/* toolbar 버튼 */
+.dashboarddiv .fc .fc-button-primary {
+background-color: transparent;
+border: none;
+}
+
+.dashboarddiv .fc-scrollgrid-sync-table {
+    width: 100%;
+}

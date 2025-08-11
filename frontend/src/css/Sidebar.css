@@ -1,0 +1,10 @@
+.sidediv {
+    background-color: #ffea82;
+    width: 10%;
+    height: 100%;
+    text-align: center;
+    position: absolute;
+}
+.titlelabel {
+    font-size: 50px;
+}
