@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
+//final이나 @NonNull 붙은 필드만을 대상으로 생성자를 자동 생성
 @RequiredArgsConstructor
 public class UserController {
 
@@ -42,7 +43,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         try {
-            String token = userService.login(body.get("mId"), body.get("mPw"));
+            ResponseEntity<String> token = userService.login(body.get("mId"), body.get("mPw"));
+            System.out.println("로그인 토큰 "+token);
             return ResponseEntity.ok().body(Map.of("token", token));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));

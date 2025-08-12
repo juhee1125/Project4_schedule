@@ -6,6 +6,8 @@ import com.project.schedule.jwt.JwtUtil;
 import com.project.schedule.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -42,7 +44,7 @@ public class UserService {
     }
     
     //로그인
-    public String login(String mId, String mPw) {
+    public ResponseEntity<String> login(String mId, String mPw) {
     	if (mId == null || mId.isEmpty()) {
             throw new IllegalArgumentException("아이디를 입력해주세요");
         }
@@ -59,7 +61,10 @@ public class UserService {
 	    }    
 
         //JWT토큰 발급
-        return jwtUtil.createToken(user.getMId());
+	    String token = jwtUtil.createToken(user.getMId());
+//	    Map<String, String> result = new HashMap<>();
+//	    result.put("token", token);
+	    return ResponseEntity.ok(token);
     }
     
     //비밀번호변경

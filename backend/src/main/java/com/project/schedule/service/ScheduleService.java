@@ -25,6 +25,7 @@ public class ScheduleService {
 
     //일정등록
     public void register(Long MNum, String sTitle, Date sDate) {
+    	System.out.println("일정등록 서비스");
     	ScheduleEntity schedule = ScheduleEntity.builder()
                 .MNum(MNum)
                 .sTitle(sTitle)
@@ -35,12 +36,13 @@ public class ScheduleService {
     }
     
     //토큰추출
-    public Long gettoken(@RequestHeader("Authorization") String authHeader) {
-    	String token = authHeader.replace("Bearer ", "");
-    	String userId = jwtUtil.getUsernameFromToken(token);
-    	UserEntity user = userRepository.findByMId(userId)
-    	        .orElseThrow(() -> new RuntimeException("회원 정보 없음"));
-    	
-    	return user.getMNum();
-    }
+//    public Long gettoken(@RequestHeader("Authorization") String authHeader) {
+//    	System.out.println("토큰추출 서비스");
+//    	String token = authHeader.replace("Bearer ", "");
+//    	String userId = jwtUtil.getUsernameFromToken(token);
+//    	UserEntity user = userRepository.findByMId(userId)
+//    	        .orElseThrow(() -> new RuntimeException("회원 정보 없음"));
+//    	
+//    	return user.getMNum();
+//    }
 }
