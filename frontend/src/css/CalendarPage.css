@@ -1,15 +1,47 @@
+@font-face {
+    font-family: 'meetme';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_1@1.0/Ownglyph_meetme-Rg.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .fc .fc-button-primary:not(:disabled):active:focus, .fc .fc-button-primary:focus {
     box-shadow: none;
 }
-.calendarP {
+.fc .fc-highlight {
+    background-color: transparent;
+}
+.fc .fc-toolbar {
+    align-items: center;
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
+}
+.fc .fc-col-header-cell-cushion {
+    font-size: 20px;
+}
+.fc .fc-view-harness {
+    background-color: white;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+.calendarP {
+    flex: 1;
+    transition: margin-right 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 .calendardiv {
-    width: 95%;
+    padding: 0 35px 35px 35px;
+    background-color: #fffae1;
+}
+.fullcalendardiv {
+  flex: 1;
 }
 .calendardiv .fc {
-    min-height: 565px;
+    min-height: 919px;
     width: 100%;
 }
 .calendardiv .fc-scrollgrid-sync-table {
@@ -17,12 +49,145 @@
 }
 .calendardiv .fc .fc-toolbar.fc-header-toolbar {
     margin: 1.5em 0;
-}
+} 
 .calendardiv .fc .fc-toolbar-title {
-    font-size: 2.5em;
+    font-size: 2em;
 }
-.calendardiv .fc .fc-button-primary, .fc .fc-button-primary:not(:disabled):active {
+.calendardiv .fc-direction-ltr .fc-toolbar > * > :not(:first-child) {
     background-color: #ffea82;
     border-color: transparent;
-    
+    color: black;
 }
+.calendardiv .fc .fc-button-primary, .fc .fc-button-primary:not(:disabled):active {
+    background-color: transparent;
+    border-color: transparent;
+    color: black;
+}
+.calendardiv .fc-event-title, .fc-event-time {
+    font-size: 17px;
+    font-weight: 500 !important;
+}
+.calendardiv .fc .fc-scrollgrid {
+    border-bottom-width: 0px;
+    border-right-width: 0px;
+    border-left-width: 0px;
+    border-top-width: 0px;
+}
+.calendardiv .fc .fc-scrollgrid-section > * {
+    border-left-width: 0px;
+    border-bottom-width: 0px;
+    border-top-width: 0px;
+    border-right-width: 0px;
+}
+.calendardiv .fc .fc-col-header-cell {
+  vertical-align: middle !important;
+  height: 40px;         
+  border-right: none !important;
+  border-bottom: 1px solid var(--fc-border-color);
+}
+.calendardiv .fc-theme-standard td {
+    border-right: 1px solid var(--fc-border-color);
+    border-bottom: 1px solid var(--fc-border-color);
+}
+.calendardiv .fc-theme-standard th {
+    border: none;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+}
+.sidebar {
+    width: 0;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+.sidebar.open {
+    width: 400px;
+}
+.sidebar input {
+    margin-bottom: 25px;
+    width: 95%;
+    border: none;
+    background-color: #f5f5f5;
+    padding: 10px;
+}
+.scheduleform {
+    padding: 25px;
+    text-align: center;
+}
+.scheduletitlediv {
+    font-size: 2em;
+    margin-bottom: 30px;
+}
+.timediv {
+    display: flex;
+}
+.timeinput {
+    width: 125px !important;
+}
+.timeinput.first {
+    margin-right: 30px;
+}
+.timeinput.second {
+    margin-left: 30px;
+}
+.timeinput react-datepicker-ignore-onclickoutside {
+    margin-left: 30px;
+}
+.react-datepicker {
+    font-family: meetme;
+    font-size: 1rem;
+    color: #333;
+    border: none;
+}
+.react-datepicker__header {
+    background-color: #fffae1;
+    border: none;
+}
+.react-datepicker__time-container {
+    width: 125px;
+}
+.react-datepicker__time-container .react-datepicker__time {
+    background-color: #fffae1;
+}
+.react-datepicker-time__header {
+    color: #333;
+    font-weight: normal;
+    font-size: 1.2rem;
+}
+.react-datepicker-popper .react-datepicker__triangle {
+    stroke: none;
+}
+.react-datepicker-popper[data-placement^=bottom] .react-datepicker__triangle {
+    fill: #fffae1;
+    color: #fffae1;
+}
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+    scrollbar-color: #ffea82 #fffae1;
+}
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
+    background-color: transparent;
+}
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+    background-color: transparent;
+    color: #ebca2a;
+}
+.calendarbutton {
+    background-color: #ffea82;
+    border: none;
+    border-radius: 10px;
+    font-family: meetme;
+    font-size: 1.5em;
+    width: 100%;
+    padding: 10px 0;
+    color: #333;
+}
+

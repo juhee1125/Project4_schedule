@@ -6,8 +6,13 @@ import FindId from "./pages/FindIdPage";
 import FindPw from "./pages/FindPwPage";
 import Dashboard from "./pages/DashboardPage";
 import Calendar from "./pages/CalendarPage";
+import TokenRoute from "./TokenRoute";
+
+import { useState } from "react";
 
 function App() {
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+
   return (
     <HashRouter>
       <Routes>
@@ -38,13 +43,17 @@ function App() {
         <Route
           path='/dashboard'
           element={
+            <TokenRoute token={token}>
               <Dashboard />
+            </TokenRoute>
           }
         />
         <Route
           path='/calendar'
           element={
+            <TokenRoute token={token}>
               <Calendar />
+            </TokenRoute>
           }
         />
       </Routes>

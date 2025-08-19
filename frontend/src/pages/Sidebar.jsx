@@ -1,16 +1,29 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
-import "../css/Sidebar.css"
+import "../css/Sidebar.css";
 
 const Sidebar = () => {
   return (
     <div className='sidediv'>
         <label className='titlelabel'>Make a Note</label>
-        <div className=''>
-            <Link to="/calendar">
-            <button type="button" className=''>캘린더</button>
-            </Link>
-        </div>
+        <NavLink to="/dashboard">
+          {({ isActive }) => (
+            <div className={isActive ? "calendarBdiv active" : "calendarBdiv"}>
+              <button type="button" className={isActive ? "calendarB active" : "calendarB"}>
+                대시보드
+              </button>
+            </div>
+          )}
+        </NavLink>
+        <NavLink to="/calendar">
+          {({ isActive }) => (
+            <div className={isActive ? "calendarBdiv active" : "calendarBdiv"}>
+              <button type="button" className={isActive ? "calendarB active" : "calendarB"}>
+                캘린더
+              </button>
+            </div>
+          )}
+        </NavLink>
     </div>
   )
 }

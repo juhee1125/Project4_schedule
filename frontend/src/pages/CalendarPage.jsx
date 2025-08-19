@@ -1,20 +1,45 @@
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+
+//날짜 포멧
+import dayjs from "dayjs";
+//시간 포멧
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import "../css/CalendarPage.css"
-import { useState, useEffect } from 'react';
+import Sidebar from './Sidebar';
+import { useState, useEffect, useRef } from 'react';
 
 const CalendarPage = () => {
-  const [dateclick, setDateclick] = useState('');
   const [title, setTitle] = useState('');
+  const [startdate, setStartdate] = useState('');
+  const [enddate, setEnddate] = useState('');
+  const [starttime, setStarttime] = useState(null);
+  const [endtime, setEndtime] = useState(null);
   const [category, setCategory] = useState('');
   const [topLabel, setTopLabel] = useState('');
+  const [schedule, setSchedule] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const calendarRef = useRef(null);
 
-  //날짜클릭
-  const handleDateClick = (arg) => {
-    setDateclick(arg.dateStr);
-  };
+  //db에 저장된 일정 불러오기
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    fetch("http://localhost:8080/api/schedule/userschedule", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+      .then((res) => res.json())
+      .then(data => setSchedule(data))
+      .catch((err) => console.error(err));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   //카테고리 API (huggingface)
   useEffect(() => {
@@ -23,20 +48,23 @@ const CalendarPage = () => {
       return;
     }
 
-    const apiToken = process.env.REACT_APP_CALENDAR_API_TOKEN
+    const apiToken = process.env.REACT_APP_CALENDAR_API_TOKEN;
+
     async function query(data) {
       const response = await fetch(
         "https://api-inference.huggingface.co/models/facebook/bart-large-mnli",
         {
           headers: {
-          Authorization: `Bearer ${apiToken}`,
-                  "Content-Type": "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiToken}`
           },
           method: "POST",
           body: JSON.stringify(data),
         }
       );
+
       const result = await response.json();
+
       return result;
     }
 
@@ -61,47 +89,63 @@ const CalendarPage = () => {
     직장: { color: "#aec3f1" }
   };
 
+  //날짜
+  const handleStartChange = (time) => {
+    setStarttime(time);
+  };
+  const handleEndChange = (time) => {
+    setEndtime(time);
+  };
+  const startKST = dayjs(starttime).format("HH:mm");
+  const endKST = dayjs(endtime).format("HH:mm");
+
+  //사이드바
+  const openSidebar = () => {
+    setIsOpen(true);
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 310);
+  };
+  const closeSidebar = () => {
+    setIsOpen(false);
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 310);
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("dateclick: ",dateclick);
 
-    if (dateclick === ''){
+    if (startdate === ''){
       alert("날짜를 클릭해주세요")
+      return
+    }
+    if (title === ''){
+      alert("일정을 입력해주세요")
+      return
+    }
+    if (starttime === '' || endtime === ''){
+      alert("시간을 선택해주세요")
       return
     }
 
     //카테고리 미수정 시 추천카테고리 전송
     const submitCategory = category === '' ? topLabel : category;
     
-    const color = categorycolor[topLabel].color;
-    console.log("submitCategory :",submitCategory, "color :",color)
+    const color = submitCategory === topLabel ? categorycolor[topLabel].color : categorycolor[category].color;
     
     try {
-      const token = localStorage.getItem("token");
-      console.log("사용자토근",token)
-      console.log("dateclick: ",dateclick);
-
-      const responseschedule = await fetch("http://localhost:8080/api/schedule/register", {
+      const responseCategorySchedule = await fetch("http://localhost:8080/api/connect", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          //로그인 시 저장했던 토큰
           "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ sDate:dateclick, sTitle:title })
+        body: JSON.stringify({ sStartdate:startdate, sEnddate:enddate, sTitle:title, sStarttime: startKST, sEndtime: endKST, cCategory:submitCategory, cColor:color })
       });
-      if(responseschedule.response===200){
-        console.log("스케줄 등록 성공")
+    
+      if(responseCategorySchedule.status===200){
+        alert("스케줄 등록 성공")
+        window.location.reload()
+
         return
       }
-      const responsecategory = await fetch("http://localhost:8080/api/category/register", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ cCategory:submitCategory, cColor:color })
-      });
-
-      console.log("responseschedule :",responseschedule, " responsecategory :",responsecategory)
 
     } catch (error) {
       console.error("로그인 오류:", error);
@@ -109,46 +153,125 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className='calendarP'>
-      <div className='calendardiv'>
-        <div className='fullcalendardiv'>
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: "prev",
-              center: "title",
-              right: "next",
-            }}
-            height="574"
-            initialView="dayGridMonth"
-            dateClick={handleDateClick}
-            events={[{ title: '회의', date: '2025-07-20' },{ title: '회의', date: '2025-07-20' },{ title: '회의', date: '2025-07-20' },
-              { title: '회의', date: '2025-07-16' },{ title: '회의', date: '2025-07-16' },{ title: '회의', date: '2025-07-16' }
-            ]}
-            locale="kr"
-            dayCellContent={(info) => {
-              return info.date.getDate();
-            }}
-          />
+    <div className='container'>
+      <Sidebar />
+      {isOpen && (
+        <div 
+          className="overlay"
+          onClick={closeSidebar}
+        />
+      )}
+      <div className="calendarP">
+        <div className='calendardiv'>
+          <div className='fullcalendardiv'>
+            <FullCalendar
+              ref={calendarRef}
+              plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+              headerToolbar={{
+                left: "prev",
+                center: "title",
+                right: "next today addEventButton",
+              }}
+              buttonText={{
+                today: "오늘"
+              }}
+              height="100%"
+              initialView="dayGridMonth"
+              selectable={true}
+              selectMirror={false}
+              //날짜 선택(다중선택 가능)
+              select={(info) => {
+                document.querySelectorAll(".fc-daygrid-day").forEach((el) => {
+                  el.style.background = "";
+                });
+                
+                let current = dayjs(info.start);
+                while (current.isBefore(info.end, "day")) {
+                  const dateStr = current.format("YYYY-MM-DD");
+                  const cell = document.querySelector(`[data-date='${dateStr}']`);
+                  if (cell) cell.style.background = "#ffea82";
+                  current = current.add(1, "day");
+                }
+
+                setStartdate(info.startStr);
+                setEnddate(dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD"));
+              }}
+              events={schedule.map(s => ({
+                title: s.title,
+                start: `${s.startdate}T${s.starttime}`,
+                end: `${s.enddate}T${s.endtime}`,
+                color: s.color
+              }))}
+              eventTimeFormat={{
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+              }}
+              titleFormat={{ year: "numeric", month: "long" }}
+              dayHeaderFormat={{ weekday: "long" }}
+              locale="kr"
+              dayCellContent={(info) => {
+                return info.date.getDate();
+              }}
+              //일정 추가
+              customButtons={{
+                addEventButton: {
+                  text: "등록",
+                  click: openSidebar,
+                },
+              }}
+            />
+          </div>
         </div>
-        <div>
-          <form onSubmit={handleSubmit} className='loginform'>
-            <label>일정</label>
+      </div>
+
+      <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <form onSubmit={handleSubmit} className='scheduleform'>
+          <div className='scheduletitlediv'>
+            <label>일정등록</label>
+          </div>
+          <div>
             <input
               type="text"
               placeholder="제목"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-            />
+            />  
+          </div>   
+          <div>
             <input
               type="text"
               placeholder={topLabel ==='' ? "카테고리" : topLabel}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
-            <button>일정등록</button>
-          </form>
-        </div>
+          </div>  
+          <div className='timediv'>
+            <DatePicker
+              selected={starttime}
+              onChange={handleStartChange}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={30}
+              timeCaption="시작"
+              dateFormat="HH:mm"
+              placeholderText="시작시간"
+              className='timeinput first'
+            />
+            <DatePicker
+              selected={endtime}
+              onChange={handleEndChange}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={30}
+              timeCaption="종료"
+              dateFormat="HH:mm"
+              placeholderText="종료시간"
+              className='timeinput second'
+            />
+          </div>
+          <button className='calendarbutton'>등록</button>
+        </form>
       </div>
     </div>
   )
