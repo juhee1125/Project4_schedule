@@ -35,10 +35,12 @@
 }
 .calendardiv {
     padding: 0 35px 35px 35px;
-    background-color: #fffae1;
+    background-color: white;
 }
 .fullcalendardiv {
-  flex: 1;
+    display: flex;
+    justify-content: center;
+    flex: 1;
 }
 .calendardiv .fc {
     min-height: 919px;
@@ -61,7 +63,7 @@
 .calendardiv .fc .fc-button-primary, .fc .fc-button-primary:not(:disabled):active {
     background-color: transparent;
     border-color: transparent;
-    color: black;
+    color: #333;
 }
 .calendardiv .fc-event-title, .fc-event-time {
     font-size: 17px;
@@ -73,24 +75,18 @@
     border-left-width: 0px;
     border-top-width: 0px;
 }
-.calendardiv .fc .fc-scrollgrid-section > * {
-    border-left-width: 0px;
-    border-bottom-width: 0px;
-    border-top-width: 0px;
-    border-right-width: 0px;
-}
 .calendardiv .fc .fc-col-header-cell {
   vertical-align: middle !important;
   height: 40px;         
   border-right: none !important;
-  border-bottom: 1px solid var(--fc-border-color);
+  border-bottom: none;
 }
 .calendardiv .fc-theme-standard td {
-    border-right: 1px solid var(--fc-border-color);
-    border-bottom: 1px solid var(--fc-border-color);
+    border: 2px solid #fffae1;
 }
 .calendardiv .fc-theme-standard th {
     border: none;
+    background-color: #fffae1;
 }
 
 .overlay {
@@ -138,6 +134,14 @@
 }
 .timeinput.second {
     margin-left: 30px;
+}
+.timeinput.first.on {
+    margin-right: 30px;
+    background-color: #dbdbdb;
+}
+.timeinput.second.on {
+    margin-left: 30px;
+    background-color: #dbdbdb;
 }
 .timeinput react-datepicker-ignore-onclickoutside {
     margin-left: 30px;
@@ -189,5 +193,40 @@
     width: 100%;
     padding: 10px 0;
     color: #333;
+    margin-top: 50px;
+}
+.togglediv {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 18px;
+    margin-top: -10px;
+}
+.timetogglebutton {
+    width: 25px;
+    height: 25px;
+    border-radius: 15px;
+}
+.timetogglebutton.off {
+    background-color: #8d8d8d;
+}
+.timetogglebutton.on {
+    background-color: #ffea82;
+}
+.timetogglebg {
+    width: 70px;
+    height: 30px;
+    border-radius: 25px;
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    margin-right: 15px;
+}
+.timetogglebg.off {
+    justify-content: flex-end;
+}
+.timetogglebg.on {
+    justify-content: flex-start;
 }
 

@@ -22,7 +22,7 @@
 }
 .calendarBdiv.active {
     align-items: center;
-    background-color: #fffae1;
+    background-color: white;
     padding: 10px;
     border-radius: 35px 0 0 35px;
     margin: 20px 0 0 20px;
@@ -37,7 +37,7 @@
     cursor: pointer;
 }
 .calendarB.active {
-    background-color: #fffae1;
+    background-color: white;
     border: none;
     padding: 10px 20px 10px 0;
     font-family: 'meetme';

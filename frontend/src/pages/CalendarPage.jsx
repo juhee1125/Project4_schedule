@@ -23,6 +23,7 @@ const CalendarPage = () => {
   const [topLabel, setTopLabel] = useState('');
   const [schedule, setSchedule] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [timetoggle, setTimetoggle] = useState(false);
   
   const calendarRef = useRef(null);
 
@@ -108,6 +109,25 @@ const CalendarPage = () => {
     setIsOpen(false);
     setTimeout(() => window.dispatchEvent(new Event("resize")), 310);
   };
+
+  //시간토글(하루종일)
+  const togglestate = () => {
+    if (!timetoggle) {
+      setTimetoggle(true)
+
+      const starttimetoggle = new Date(`${startdate}T00:00:00`);
+      const endtimetoggle = new Date(`${enddate}T23:59:59`);
+      setStarttime(starttimetoggle);
+      setEndtime(endtimetoggle);
+
+      return
+    }
+    if (timetoggle) {
+      setTimetoggle(false)
+
+      return
+    }
+  }
 
 
   const handleSubmit = async (e) => {
@@ -256,7 +276,8 @@ const CalendarPage = () => {
               timeCaption="시작"
               dateFormat="HH:mm"
               placeholderText="시작시간"
-              className='timeinput first'
+              className={timetoggle ? 'timeinput first on' : 'timeinput first'}
+              disabled={timetoggle}
             />
             <DatePicker
               selected={endtime}
@@ -267,8 +288,15 @@ const CalendarPage = () => {
               timeCaption="종료"
               dateFormat="HH:mm"
               placeholderText="종료시간"
-              className='timeinput second'
+              className={timetoggle ? 'timeinput second on' : 'timeinput second'}
+              disabled={timetoggle}
             />
+          </div>
+          <div className='togglediv'>
+            <div className={timetoggle ? 'timetogglebg on' : 'timetogglebg off'}>
+              <div className={timetoggle ? 'timetogglebutton on' : 'timetogglebutton off'} onClick={()=>togglestate()}></div>
+            </div>
+            <label>하루종일</label>
           </div>
           <button className='calendarbutton'>등록</button>
         </form>

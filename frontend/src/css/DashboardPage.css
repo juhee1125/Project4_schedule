@@ -1,32 +1,86 @@
-.fullcalendardiv {
+.dashboarddiv {
+    flex: 1;
     display: flex;
-    justify-content: center;
+    padding: 20px;
+}
+.Dcalendardiv {
+    margin-right: 20px;
 }
 /* 캘린더 전체 사이즈 조정 */
 .dashboarddiv .fc {
     min-width: 500px;
-    min-height: 500px;
+    height: 500px;
 }
-
 /* toolbar container */
 .dashboarddiv .fc .fc-toolbar.fc-header-toolbar {
 margin: 0;
 padding: 0 40px;
-background-color: #356eff;
+background-color: #fffae1;
 height: 63px;
 font-weight: 600;
 font-size: 12px;
 line-height: 29px;
-color: white;
+color: #333;
 border-radius: 20px 20px 0px 0px;
 }
-
+.dashboarddiv .fc .fc-toolbar {
+    justify-content: space-between;
+}
 /* toolbar 버튼 */
 .dashboarddiv .fc .fc-button-primary {
 background-color: transparent;
 border: none;
 }
-
 .dashboarddiv .fc-scrollgrid-sync-table {
     width: 100%;
+}
+.dashboarddiv .fc .fc-button-primary, .fc .fc-button-primary:not(:disabled):active {
+    background-color: transparent;
+    border-color: transparent;
+    color: #333;
+    font-size: 15px;
+}
+.dashboarddiv .fc .fc-view-harness-active > .fc-view {
+    background-color: #fffae1;
+    border-radius: 0px 0px 20px 20px;
+}
+.dashboarddiv .fc .fc-scrollgrid-section > * {
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+}
+.dashboarddiv .fc-theme-standard .fc-scrollgrid {
+    border-left: none;
+}
+.schedulelistdiv {
+    background-color: #fffae1;
+    border-radius: 20px;
+    height: 460px;
+    padding: 20px;
+    text-align: center;
+}
+.schedulelistlabel {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.schedulelistsubdiv {
+    display: flex;
+    align-items: center;
+    text-align: left;
+}
+.schedulecolorbox {
+    width: 10px;
+    height: 35px;
+}
+.schedulelist {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: 20px;
+}
+.datelabel {
+    opacity: 90%;
+}
+.titleTimelabel {
+    font-size: 18px;
 }
