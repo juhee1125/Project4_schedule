@@ -1,3 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +10,34 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  font-family: meetme;
+  color: #333;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* input {
+  @apply
+    font-family: meetme;
+    font-size: 20px;
+    color: #333;
+    border-radius: 5px;
+    background-color: transparent; 
+    outline: none;
+    height: 30px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+} */
+ @layer base {
+  input {
+    @apply font-meetme text-xl text-[#333] rounded bg-transparent outline-none h-8 mb-2.5 pl-2.5;
+  }
+}
+
+input::placeholder {
+    color: #333;
 }

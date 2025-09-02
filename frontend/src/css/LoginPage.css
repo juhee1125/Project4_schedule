@@ -1,14 +1,14 @@
-@font-face {
+/* @font-face {
     font-family: 'meetme';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_1@1.0/Ownglyph_meetme-Rg.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-}
-body {
+} */
+/* body {
     font-family: meetme;
     color: #333;
-}
-input {
+} */
+/* input {
     font-family: meetme;
     font-size: 20px;
     color: #333;
@@ -21,41 +21,41 @@ input {
 }
 input::placeholder {
     color: #333;
-}
+} */
     
-.loginP {
+/* .loginP {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     background-color: #ffea82;
     height: 100vh;
-}
-.loginform {
+} */
+/* .loginform {
     width: 15%;
     display: flex;
     flex-direction: column;
     text-align: center;
     margin-bottom: 30px;
-}
-.loginlabel {
+} */
+/* .loginlabel {
     font-size: 50px;
     margin-bottom: 30px;
-}
-.input-error {
+} */
+/* .input-error {
     border: #d84343 solid 2px;
-}
-.input-nonerror {
+} */
+/* .input-nonerror {
     border: #333 solid 2px;
-}
-.errorcontainer {
+} */
+/* .errorcontainer {
     min-height: 25px;
-}
-.errorlabel {
+} */
+/* .errorlabel {
     font-size: 20px;
     color: #d84343;
-}
-.loginbutton {
+} */
+/* .loginbutton {
     font-family: meetme;
     font-size: 25px;
     color: #333;
@@ -65,17 +65,17 @@ input::placeholder {
     height: 40px;
     margin-top: 15px;
     cursor: pointer;
-}
-.linkcontainer {
+} */
+/* .linkcontainer {
     display: flex;
     justify-content: space-between;
     width: 15%;
-}
-.linkbutton {
+} */
+/* .linkbutton {
     font-family: meetme;
     font-size: 20px;
     color: #b1a467;
     background-color: transparent;
     border: none;
     cursor: pointer;
-}
+} */

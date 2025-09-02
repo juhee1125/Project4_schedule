@@ -15,6 +15,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const CalendarPage = () => {
   const [title, setTitle] = useState('');
+  const [debouncedTitle, setDebouncedTitle] = useState(title);
   const [startdate, setStartdate] = useState('');
   const [enddate, setEnddate] = useState('');
   const [starttime, setStarttime] = useState(null);
@@ -44,42 +45,39 @@ const CalendarPage = () => {
 
   //카테고리 API (huggingface)
   useEffect(() => {
-    if (!title || title.trim() === "") {
-      console.log("입력값 없음")
-      return;
-    }
+    const handler = setTimeout(() => {
+      setDebouncedTitle(title);
+    }, 500);
 
-    const apiToken = process.env.REACT_APP_CALENDAR_API_TOKEN;
+    return () => clearTimeout(handler);
+  }, [title]);
 
-    async function query(data) {
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/facebook/bart-large-mnli",
-        {
-          headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiToken}`
-          },
-          method: "POST",
-          body: JSON.stringify(data),
-        }
-      );
+  useEffect(() => {
+    if (!debouncedTitle || debouncedTitle.trim() === "") return;
 
-      const result = await response.json();
-
-      return result;
-    }
-
-    query({
+    fetch("http://localhost:8081/api/classify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         inputs: title,
-        parameters: { candidate_labels: ["운동", "공부", "약속", "기념일", "직장"] }
-    }).then((response) => {
+        parameters: { candidate_labels: ["운동", "공부", "약속", "기념일", "직장", "여행"] }
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data || !data.labels || !data.scores) {
+          console.error("API 응답 오류", data);
+          return;
+        }
+
         //가장 높은 확률의 label 추출
-        const { labels, scores } = response;
+        const { labels, scores } = data;
         const maxIndex = scores.indexOf(Math.max(...scores));
         const topLabel = labels[maxIndex];
         setTopLabel(topLabel);
-    });
-  }, [title]);
+      })
+      .catch(err => console.error("Fetch 실패:", err));
+  }, [debouncedTitle]);
 
   //카테고리 별 색
   let categorycolor = {
@@ -87,7 +85,8 @@ const CalendarPage = () => {
     공부: { color: "#ffbf70" },
     약속: { color: "#ffef9f" },
     기념일: { color: "#d6f3a7" },
-    직장: { color: "#aec3f1" }
+    직장: { color: "#aec3f1" },
+    여행: { color: "#d9b2f3ff" }
   };
 
   //날짜
@@ -112,6 +111,11 @@ const CalendarPage = () => {
 
   //시간토글(하루종일)
   const togglestate = () => {
+    if (startdate === '' || enddate === '') {
+      alert("날짜를 골라주세요")
+      
+      return
+    }
     if (!timetoggle) {
       setTimetoggle(true)
 
@@ -149,7 +153,19 @@ const CalendarPage = () => {
     //카테고리 미수정 시 추천카테고리 전송
     const submitCategory = category === '' ? topLabel : category;
     
-    const color = submitCategory === topLabel ? categorycolor[topLabel].color : categorycolor[category].color;
+    //추천카테고리 리스트에 없는 카테고리 입력 시 랜덤 색 저장
+    let color =""
+    if (topLabel !== "운동" && topLabel !== "공부" && topLabel !== "약속" && topLabel !== "기념일" && topLabel !== "직장" && topLabel !== "여행") {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+
+      color = `#${r.toString(16).padStart(2, "0")}${g
+        .toString(16)
+        .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    } else{
+      color = submitCategory === topLabel ? categorycolor[topLabel].color : categorycolor[category].color;
+    }
     
     try {
       const responseCategorySchedule = await fetch("http://localhost:8080/api/connect", {
@@ -173,17 +189,17 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className='container'>
+    <div className='flex h-screen'>
       <Sidebar />
       {isOpen && (
         <div 
-          className="overlay"
+          className="fixed top-0 left-0 w-full h-full z-[999]"
           onClick={closeSidebar}
         />
       )}
-      <div className="calendarP">
-        <div className='calendardiv'>
-          <div className='fullcalendardiv'>
+      <div className="flex flex-1 flex-col">
+        <div className='p-[0_35px_35px_35px] bg-white' id='calendardiv'>
+          <div className='flex flex-1 justify-center'>
             <FullCalendar
               ref={calendarRef}
               plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
@@ -245,13 +261,14 @@ const CalendarPage = () => {
         </div>
       </div>
 
-      <div className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <form onSubmit={handleSubmit} className='scheduleform'>
-          <div className='scheduletitlediv'>
+      <div className={`${isOpen ? 'w-[400px]' : 'w-0'} flex justify-center overflow-hidden bg-white shadow-[-2px_0_5px_rgba(0,0,0,0.2)] transition-[width] duration-300 ease-in-out z-[1000]`}>
+        <form onSubmit={handleSubmit} className='p-6 text-center'>
+          <div className='text-3xl mb-8'>
             <label>일정등록</label>
           </div>
           <div>
             <input
+              className='mb-6 border-none bg-[#f5f5f5] p-2.5 w-[100%]'
               type="text"
               placeholder="제목"
               value={title}
@@ -260,13 +277,14 @@ const CalendarPage = () => {
           </div>   
           <div>
             <input
+              className='mb-6 border-none bg-[#f5f5f5] p-2.5 w-[100%]'
               type="text"
               placeholder={topLabel ==='' ? "카테고리" : topLabel}
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             />
           </div>  
-          <div className='timediv'>
+          <div className='flex'>
             <DatePicker
               selected={starttime}
               onChange={handleStartChange}
@@ -276,7 +294,8 @@ const CalendarPage = () => {
               timeCaption="시작"
               dateFormat="HH:mm"
               placeholderText="시작시간"
-              className={timetoggle ? 'timeinput first on' : 'timeinput first'}
+              className={`${timetoggle ? 'bg[#dbdbdb]' : ''} justify-center mb-6 border-none bg-[#f5f5f5] p-2.5 !w-[125px] mr-8`}
+              id='timeinput'
               disabled={timetoggle}
             />
             <DatePicker
@@ -288,17 +307,18 @@ const CalendarPage = () => {
               timeCaption="종료"
               dateFormat="HH:mm"
               placeholderText="종료시간"
-              className={timetoggle ? 'timeinput second on' : 'timeinput second'}
+              className={`${timetoggle ? 'bg[#dbdbdb]' : ''} justify-center mb-6 border-none bg-[#f5f5f5] p-2.5 !w-[125px] ml-8`}
+              id='timeinput'
               disabled={timetoggle}
             />
           </div>
-          <div className='togglediv'>
-            <div className={timetoggle ? 'timetogglebg on' : 'timetogglebg off'}>
-              <div className={timetoggle ? 'timetogglebutton on' : 'timetogglebutton off'} onClick={()=>togglestate()}></div>
+          <div className='flex justify-end items-center text-lg -mt-3'>
+            <div className={`${timetoggle ? 'justify-start' : 'justify-end'} flex items-center w-[70px] h-8 rounded-3xl bg-[#f5f5f5] p-1 mr-4`}>
+              <div className={`${timetoggle ? 'bg-[#ffea82]' : 'bg-[#8d8d8d]'} w-6 h-6 rounded-2xl`} onClick={()=>togglestate()}></div>
             </div>
             <label>하루종일</label>
           </div>
-          <button className='calendarbutton'>등록</button>
+          <button className='bg-[#ffea82] border-none rounded-xl font-meetme text-2xl text-[#333] w-[100%] p-[10px_0] mt-12'>등록</button>
         </form>
       </div>
     </div>

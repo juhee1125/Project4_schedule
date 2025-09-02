@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import '../css/SignupPage.css';
-
 function SignupPage() {
     const [mName, setMName] = useState('');
     const [mId, setMId] = useState('');
@@ -126,65 +124,70 @@ function SignupPage() {
     };
 
   return (
-    <div className='signupP'>
-      <form onSubmit={handleSubmit} className='signupform'>
-        <label className='signuplabel'>회원가입</label>
+    <div className='flex flex-col justify-center items-center bg-[#ffea82] h-screen'>
+      <form onSubmit={handleSubmit} className='flex flex-col text-center mb-7 w-[15%]'>
+        <label className='text-5xl mb-7'>회원가입</label>
         <input
-          className="nameinput"
+          className="border-2 border-[#333]"
           type="text"
           placeholder="* 성명"
           value={mName}
           onChange={(e) => setMName(e.target.value)}
         />
-        <div className='idcontainer'>
+        <div className='flex justify-between'>
           <input
+            className="border-2 border-[#333]"
             type="text"
             placeholder="* 아이디"
             value={mId}
             onChange={(e) => setMId(e.target.value)}
           />
-          <button type="button" onClick={checkDuplicateId} className='duplicatebutton'>중복확인</button>
+          <button type="button" onClick={checkDuplicateId} className='font-meetme text-xl text-[#333] border-none rounded bg-white w-20 h-9 cursor-pointer'>중복확인</button>
         </div>
-        <div className="idpwcontainer">
-          <label className="idlabel">
+        <div className="mb-7">
+          <label className="text-xl">
             {idMessage ? idMessage : ""}
           </label>
         </div>
         <input
+          className="border-2 border-[#333]"
           type="password"
           placeholder="* 비밀번호"
           value={mPw}
           onChange={(e) => setMPw(e.target.value)}
         />
         <input
+          className="border-2 border-[#333]"
           type="password"
           placeholder="* 비밀번호 확인"
           value={mPwCheck}
           onChange={(e) => setMPwCheck(e.target.value)}
         />
-        <label className='pwnotice'>영문, 숫자, 특수문자 포함 8글자 이상 기재해주세요</label>
-        <div className="idpwcontainer">
-          <label className="pwlabel">
+        <label className='text-[#b1a467] mb-2'>영문, 숫자, 특수문자 포함 8글자 이상 기재해주세요</label>
+        <div className="min-h-6 text-xl">
+          <label className="text-xl">
             {pwMessage}
           </label>
         </div>
         <input
+          className="border-2 border-[#333]"
           type="text"
           placeholder="* 휴대폰번호"
           value={formatPhone(mPhone)}
           onChange={(e) => setMPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
         />
         <input
+          className="border-2 border-[#333]"
           type="text"
           placeholder="이메일"
           value={mEmail}
           onChange={(e) => setMEmail(e.target.value)}
         />
-        <button type="submit" className='signupbutton'>회원가입</button>
+        <button type="submit" className='font-meetme text-2xl text-[#333] border-none rounded bg-white h-10 mt-10 cursor-pointer'>회원가입</button>
       </form>
-      <div className='loginlinkcontainer'>
+      <div className='text-center'>
         <Link to="/">
-          <button type="button" className='linkbutton'>로그인</button>
+          <button type="button" className='font-meetme text-xl text-[#b1a467] bg-transparent border-none cursor-pointer'>로그인</button>
         </Link>
       </div>
     </div>
