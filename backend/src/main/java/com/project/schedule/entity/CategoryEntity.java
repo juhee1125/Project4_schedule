@@ -10,10 +10,11 @@ import lombok.*;
 @Builder
 public class CategoryEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cNum;
+    @Column(name = "c_num")
+    private Long CNum;
     
     @Column(name = "c_category")
-    private String cCategory;
+    private String CCategory;
     @Column(name = "c_color")
-    private String cColor;
+    private String CColor;
 }

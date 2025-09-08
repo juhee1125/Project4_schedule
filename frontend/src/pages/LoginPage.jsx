@@ -40,6 +40,7 @@ const LoginPage = () => {
 
       //토큰 저장
       localStorage.setItem("token", text.token.body);
+      console.log("token",text.token.body)
       navigate("/dashboard");
     } catch (error) {
       console.error("로그인 오류:", error);

@@ -78,6 +78,7 @@ const DashboardPage = () => {
                 today: "오늘"
               }}
             events={schedule.map(s => ({
+              id: s.snum,
               title: s.title,
               start: `${s.startdate}T${s.starttime}`,
               end: `${s.enddate}T${s.endtime}`,

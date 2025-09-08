@@ -16,12 +16,12 @@ public class ConnectService {
     private final ConnectRepository connectRepository;
 
     //일정등록
-    public void connect(Long sNum, Long cNum) {
+    public void register(Long sNum, Long cNum) {
     	ConnectEntity connect = ConnectEntity.builder()
-                .sNum(sNum)
-                .cNum(cNum)
+                .SNum(sNum)
+                .CNum(cNum)
                 .build();
-
-    	connectRepository.save(connect);
+    	
+        connectRepository.save(connect);
     }
 }

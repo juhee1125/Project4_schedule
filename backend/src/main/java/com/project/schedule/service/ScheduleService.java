@@ -1,48 +1,51 @@
 package com.project.schedule.service;
 
+import com.project.schedule.entity.CategoryEntity;
 import com.project.schedule.entity.ScheduleEntity;
-import com.project.schedule.entity.UserEntity;
-import com.project.schedule.jwt.JwtUtil;
 import com.project.schedule.repository.ScheduleRepository;
-import com.project.schedule.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import java.sql.Date;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 @Service
-@Transactional
+@Transactional	
 @RequiredArgsConstructor
 public class ScheduleService {
 	
 	private final ScheduleRepository scheduleRepository;
-	private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
 
     //일정등록
-    public void register(Long MNum, String sTitle, Date sDate) {
-    	System.out.println("일정등록 서비스");
+    public Long register(Long MNum, String sTitle, Date sStartdate, Date sEnddate, String sStarttime, String sEndtime) {
     	ScheduleEntity schedule = ScheduleEntity.builder()
                 .MNum(MNum)
-                .sTitle(sTitle)
-                .sDate(sDate)
+                .STitle(sTitle)
+                .SStartdate(sStartdate)
+                .SEnddate(sEnddate)
+                .SStarttime(sStarttime)
+                .SEndtime(sEndtime)
                 .build();
 
-    	scheduleRepository.save(schedule);
+    	ScheduleEntity saved = scheduleRepository.save(schedule);
+    	
+    	return saved.getSNum();
     }
     
-    //토큰추출
-//    public Long gettoken(@RequestHeader("Authorization") String authHeader) {
-//    	System.out.println("토큰추출 서비스");
-//    	String token = authHeader.replace("Bearer ", "");
-//    	String userId = jwtUtil.getUsernameFromToken(token);
-//    	UserEntity user = userRepository.findByMId(userId)
-//    	        .orElseThrow(() -> new RuntimeException("회원 정보 없음"));
-//    	
-//    	return user.getMNum();
-//    }
+    //일정수정
+    @Transactional
+    public void update(Long sNum, String sTitle, Date sStartdate, Date sEnddate, String sStarttime, String sEndtime) {
+    	System.out.println(scheduleRepository.findBySNum(sNum));
+    	ScheduleEntity schedule = scheduleRepository.findBySNum(sNum)
+    	        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 일정 ID: " + sNum));
+
+    	schedule.setSTitle(sTitle);
+    	schedule.setSStartdate(sStartdate);
+    	schedule.setSEnddate(sEnddate);
+    	schedule.setSStarttime(sStarttime);
+    	schedule.setSEndtime(sEndtime);
+    }
 }

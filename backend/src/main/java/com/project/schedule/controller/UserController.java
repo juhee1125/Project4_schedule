@@ -42,6 +42,7 @@ public class UserController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+    	System.out.println("로그인페이지");
         try {
             ResponseEntity<String> token = userService.login(body.get("mId"), body.get("mPw"));
             System.out.println("로그인 토큰 "+token);
@@ -57,7 +58,7 @@ public class UserController {
     	String mName = body.get("mName");
     	String mPhone = body.get("mPhone");
     	Optional<UserEntity> user = userRepository.findByMNameAndMPhone(mName, mPhone);
-
+    	
 		if (user.isPresent()) {
 		    String userId = user.get().getMId();
 		    

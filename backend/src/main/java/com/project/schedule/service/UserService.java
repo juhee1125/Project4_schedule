@@ -62,8 +62,6 @@ public class UserService {
 
         //JWT토큰 발급
 	    String token = jwtUtil.createToken(user.getMId());
-//	    Map<String, String> result = new HashMap<>();
-//	    result.put("token", token);
 	    return ResponseEntity.ok(token);
     }
     

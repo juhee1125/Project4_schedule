@@ -31,9 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        String path = request.getRequestURI();
 
         // Authorization 헤더가 없거나 Bearer 로 시작하지 않으면 그냥 통과
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ") || path.equals("/api/user/checkId")) {
             filterChain.doFilter(request, response);
             return;
         }

@@ -13,7 +13,7 @@ public class ConnectEntity {
     private Long coNum;
     
     @Column(name = "s_num")
-    private Long sNum;
+    private Long SNum;
     @Column(name = "c_num")
-    private Long cNum;
+    private Long CNum;
 }

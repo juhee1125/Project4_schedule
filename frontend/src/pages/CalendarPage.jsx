@@ -2,6 +2,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { FiPlusSquare } from "react-icons/fi";
 
 //날짜 포멧
 import dayjs from "dayjs";
@@ -25,6 +26,9 @@ const CalendarPage = () => {
   const [schedule, setSchedule] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [timetoggle, setTimetoggle] = useState(false);
+  const [eventclick, setEventclick] = useState(null);
+  const [eventOpen, setEventOpen] = useState(false);
+  const [modifyschedulestate, setModifyschedulestate] = useState(false);
   
   const calendarRef = useRef(null);
 
@@ -43,7 +47,7 @@ const CalendarPage = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  //카테고리 API (huggingface)
+  //카테고리 입력 완료 후 API 전송
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedTitle(title);
@@ -51,7 +55,7 @@ const CalendarPage = () => {
 
     return () => clearTimeout(handler);
   }, [title]);
-
+  //카테고리 API (huggingface)
   useEffect(() => {
     if (!debouncedTitle || debouncedTitle.trim() === "") return;
 
@@ -96,6 +100,13 @@ const CalendarPage = () => {
   const handleEndChange = (time) => {
     setEndtime(time);
   };
+  const formatDateISO = (date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  //시간
   const startKST = dayjs(starttime).format("HH:mm");
   const endKST = dayjs(endtime).format("HH:mm");
 
@@ -107,23 +118,30 @@ const CalendarPage = () => {
   const closeSidebar = () => {
     setIsOpen(false);
     setTimeout(() => window.dispatchEvent(new Event("resize")), 310);
+
+    setTitle('');
+    setCategory('');
+    setStartdate('');
+    setEnddate('');
+    setStarttime(null);
+    setEndtime(null);
+    setTimetoggle(false);
+    setModifyschedulestate(false);
   };
 
   //시간토글(하루종일)
-  const togglestate = () => {
-    if (startdate === '' || enddate === '') {
+  const togglestate = (start, end) => {
+    if (start === '' || end === '') {
       alert("날짜를 골라주세요")
       
       return
     }
     if (!timetoggle) {
       setTimetoggle(true)
-
-      const starttimetoggle = new Date(`${startdate}T00:00:00`);
-      const endtimetoggle = new Date(`${enddate}T23:59:59`);
+      const starttimetoggle = new Date(`${start}T00:00:00`);
+      const endtimetoggle = new Date(`${end}T23:59:59`);
       setStarttime(starttimetoggle);
       setEndtime(endtimetoggle);
-
       return
     }
     if (timetoggle) {
@@ -133,7 +151,31 @@ const CalendarPage = () => {
     }
   }
 
+  //세부일정
+  const handleEventClick = (info) => {
+    setEventOpen(true);
+    setEventclick({
+      id: info.event.id,
+      title: info.event.title,
+      start: info.event.start,
+      end: info.event.end,
+      color: info.event.backgroundColor
+    });
 
+    // let detaileventdiv = document.getElementById("detailevent");
+    // detaileventdiv.style.display = "flex";
+    // setEventOpen(false)
+  };
+  const getCategoryByColor = (color) => {
+    return (
+      Object.keys(categorycolor).find(
+        (key) => categorycolor[key].color.toLowerCase() === color.toLowerCase()
+      ) || "기타"
+    );
+  };
+
+
+  //일정등록
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -155,7 +197,8 @@ const CalendarPage = () => {
     
     //추천카테고리 리스트에 없는 카테고리 입력 시 랜덤 색 저장
     let color =""
-    if (topLabel !== "운동" && topLabel !== "공부" && topLabel !== "약속" && topLabel !== "기념일" && topLabel !== "직장" && topLabel !== "여행") {
+    if (category !== "운동" && category !== "공부" && category !== "약속" && category !== "기념일" && category !== "직장" && category !== "여행") {
+      console.log("없는카테고리")
       const r = Math.floor(Math.random() * 256);
       const g = Math.floor(Math.random() * 256);
       const b = Math.floor(Math.random() * 256);
@@ -164,29 +207,92 @@ const CalendarPage = () => {
         .toString(16)
         .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
     } else{
+      console.log("topLabel",topLabel)
+      console.log("있는카테고리")
       color = submitCategory === topLabel ? categorycolor[topLabel].color : categorycolor[category].color;
     }
     
-    try {
-      const responseCategorySchedule = await fetch("http://localhost:8080/api/connect", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ sStartdate:startdate, sEnddate:enddate, sTitle:title, sStarttime: startKST, sEndtime: endKST, cCategory:submitCategory, cColor:color })
-      });
-    
-      if(responseCategorySchedule.status===200){
-        alert("스케줄 등록 성공")
-        window.location.reload()
+    if(!modifyschedulestate) {
+      try {
+        const responseCategorySchedule = await fetch("http://localhost:8080/api/register", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` },
+          body: JSON.stringify({ sStartdate:startdate, sEnddate:enddate, sTitle:title, sStarttime: startKST, sEndtime: endKST, cCategory:submitCategory, cColor:color })
+        });
+      
+        if(responseCategorySchedule.status===200){
+          alert("스케줄 등록 성공")
+          window.location.reload()
 
-        return
+          return
+        }
+
+      } catch (error) {
+        console.error("로그인 오류:", error);
       }
+    } else {
+      console.log(color)
+      try {
+        const responseCategorySchedule = await fetch("http://localhost:8080/api/modify", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` },
+          body: JSON.stringify({ sSnum:eventclick.id, sStartdate:startdate, sEnddate:enddate, sTitle:title, sStarttime: startKST, sEndtime: endKST, cCategory:submitCategory, cColor:color })
+        });
+      
+        if(responseCategorySchedule.status===200){
+          alert("스케줄 수정 성공")
+          window.location.reload()
 
-    } catch (error) {
-      console.error("로그인 오류:", error);
+          return
+        }
+
+      } catch (error) {
+        console.error("수정 오류:", error);
+      }
     }
+    
   };
+  //일정수정
+  const handleModify = async (e) => {
+    e.preventDefault();
+
+    setTitle(eventclick.title);
+
+    setCategory(getCategoryByColor(eventclick.color));
+
+    const dateStart = formatDateISO(eventclick.start);
+    setStartdate(dateStart);
+    const dateEnd = formatDateISO(eventclick.end);
+    setEnddate(dateEnd);
+
+    const timestart = new Date();
+    timestart.setHours(eventclick.start.getHours());
+    timestart.setMinutes(eventclick.start.getMinutes());
+    const timeend = new Date();
+    timeend.setHours(eventclick.end.getHours());
+    timeend.setMinutes(eventclick.end.getMinutes());
+
+    const alltimestart = new Date(timestart);
+    const alltimeend = new Date(timeend);
+    if (alltimestart.getHours() === 0 && alltimestart.getMinutes() === 0 && alltimeend.getHours() === 23 && alltimeend.getMinutes() === 59) {
+      setTimetoggle(true);
+      togglestate(dateStart,dateEnd);
+    } else {
+      setStarttime(timestart);
+      setEndtime(timeend);
+    }
+
+    setEventOpen(false);
+    setModifyschedulestate(true);
+    openSidebar();
+  }
+  //일정삭제
+  // const handleDelete = async (e) => {}
+
 
   return (
     <div className='flex h-screen'>
@@ -198,7 +304,7 @@ const CalendarPage = () => {
         />
       )}
       <div className="flex flex-1 flex-col">
-        <div className='p-[0_35px_35px_35px] bg-white' id='calendardiv'>
+        <div className='p-[0_35px_0_35px] bg-white' id='calendardiv'>
           <div className='flex flex-1 justify-center'>
             <FullCalendar
               ref={calendarRef}
@@ -233,11 +339,14 @@ const CalendarPage = () => {
                 setEnddate(dayjs(info.end).subtract(1, "day").format("YYYY-MM-DD"));
               }}
               events={schedule.map(s => ({
+                id: s.snum,
                 title: s.title,
-                start: `${s.startdate}T${s.starttime}`,
-                end: `${s.enddate}T${s.endtime}`,
+                start: new Date(`${s.startdate}T${s.starttime}`),
+                end: new Date(`${s.enddate}T${s.endtime}`),
                 color: s.color
               }))}
+              //세부일정
+              eventClick={handleEventClick}
               eventTimeFormat={{
                 hour: "2-digit",
                 minute: "2-digit",
@@ -261,6 +370,7 @@ const CalendarPage = () => {
         </div>
       </div>
 
+      {/* 일정등록 사이드바 */}
       <div className={`${isOpen ? 'w-[400px]' : 'w-0'} flex justify-center overflow-hidden bg-white shadow-[-2px_0_5px_rgba(0,0,0,0.2)] transition-[width] duration-300 ease-in-out z-[1000]`}>
         <form onSubmit={handleSubmit} className='p-6 text-center'>
           <div className='text-3xl mb-8'>
@@ -314,13 +424,38 @@ const CalendarPage = () => {
           </div>
           <div className='flex justify-end items-center text-lg -mt-3'>
             <div className={`${timetoggle ? 'justify-start' : 'justify-end'} flex items-center w-[70px] h-8 rounded-3xl bg-[#f5f5f5] p-1 mr-4`}>
-              <div className={`${timetoggle ? 'bg-[#ffea82]' : 'bg-[#8d8d8d]'} w-6 h-6 rounded-2xl`} onClick={()=>togglestate()}></div>
+              <div className={`${timetoggle ? 'bg-[#ffea82]' : 'bg-[#8d8d8d]'} w-6 h-6 rounded-2xl`} onClick={()=>togglestate(startdate,enddate)}></div>
             </div>
             <label>하루종일</label>
           </div>
-          <button className='bg-[#ffea82] border-none rounded-xl font-meetme text-2xl text-[#333] w-[100%] p-[10px_0] mt-12'>등록</button>
+          <button className='bg-[#ffea82] border-none rounded-xl font-meetme text-2xl text-[#333] w-[100%] p-[10px_0] mt-12'>{modifyschedulestate ? "수정" : "등록"}</button>
         </form>
       </div>
+
+      {/* 일정수정 및 삭제 모달 */}
+      {eventOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 z-[1000]" id='detailevent'>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <div className='flex justify-between mb-3'>
+              <div>{eventclick.start.toLocaleString("ko-KR")}</div>
+              <div>{eventclick.end.toLocaleString("ko-KR")}</div>
+            </div>
+            <div className='text-xl mb-2'>
+              {eventclick.title}
+            </div>
+            <div className='flex items-center'>
+              <label className='text-xl text-center rounded-lg p-[0_20px_0_20px] leading-[1.5] h-[33px] mr-3' style={{ backgroundColor: eventclick.color }}>
+                {getCategoryByColor(eventclick.color)}
+              </label>
+              <FiPlusSquare className='w-[40px] h-[40px] text-[#EAEAEA] cursor-pointer'/>
+            </div>
+            <div className='flex justify-between mt-3'>
+              <button className='bg-[#EAEAEA] text-xl rounded-lg w-40 h-8' onClick={handleModify}>수정</button>
+              <button className='bg-[#EAEAEA] text-xl rounded-lg w-40 h-8' onClick={() => setEventclick(null)}>닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

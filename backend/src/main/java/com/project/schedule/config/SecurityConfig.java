@@ -31,7 +31,7 @@ public class SecurityConfig {
             .cors().and()
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/user/signup", "/api/user/login").permitAll()
+                .requestMatchers("/api/user/signup", "api/user/checkId", "/api/user/login", "/api/user/findID", "/api/user/verifyID", "/api/user/changePW").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository),
